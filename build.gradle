@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.testinginjakartaee'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.10.2'
+}
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// to fix the problem with the default gradle output directories for the test discovery of beans.xml and persistence.xml
+sourceSets {
+    main {
+        output.resourcesDir = "build/classes/java/main"
+    }
+    test {
+        output.resourcesDir = "build/classes/java/test"
+    }
+}
+
+dependencies {
+    compileOnly('jakarta.platform:jakarta.jakartaee-api:10.0.0')
+    compileOnly('org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1')
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+    // to be able to use @Mock in the tests
+    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+
+    // to be able to use CDI in the tests
+    testImplementation("de.hilling.junit.cdi:cdi-test-core:4.3.0")
+    testImplementation("de.hilling.junit.cdi:cdi-test-jee:4.3.0")
+
+    // to use an in-memory database in the tests
+    testRuntimeOnly("org.hibernate:hibernate-core-jakarta:5.6.15.Final")
+    testRuntimeOnly("com.h2database:h2:2.3.232")
+}
+
+test {
+    useJUnitPlatform()
+}
